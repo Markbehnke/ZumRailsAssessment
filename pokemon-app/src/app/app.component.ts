@@ -1,16 +1,10 @@
 import { Component } from '@angular/core';
+import { TournamentStatisticsComponent } from './tournament-statistics.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [],
-  template: `
-    <h1>Welcome to {{title}}!</h1>
-
-    
-  `,
-  styles: [],
+  imports: [TournamentStatisticsComponent],
+  templateUrl: './app.component.html'
 })
-export class AppComponent {
-  title = 'pokemon-app';
-}
+export class AppComponent { }
