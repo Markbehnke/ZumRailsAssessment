@@ -203,14 +203,12 @@ namespace PokemonWebAPI.Services
                 else
                 {
                     var errorMessage = $"Failed to fetch Pokémon data for ID {id}. Status Code: {response.StatusCode}.";
-                    Console.WriteLine(errorMessage); 
                     return null; 
                 }
             }
             catch (Exception ex)
             {
                 var errorMessage = $"Unexpected error while fetching Pokémon data for ID {id}. Exception: {ex.Message}";
-                Console.WriteLine(errorMessage); 
                 return null;  
             }
         }
