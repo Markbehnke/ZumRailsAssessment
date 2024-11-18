@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "X61LvozMM1KrB70dPoIqAEE3ZdxAPDwMdcKED9GXA/Q=",
+  "Source": "PokemonWebAPI",
+  "BasePath": "_content/PokemonWebAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
