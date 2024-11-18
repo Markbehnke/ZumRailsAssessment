@@ -6,6 +6,7 @@ namespace PokemonWebAPI.Models
 {
     public class Pokemon
     {
+        [JsonPropertyName("id")]
         public int PokemonId { get; set; }
         public string Name { get; set; }
         [JsonPropertyName("types")]

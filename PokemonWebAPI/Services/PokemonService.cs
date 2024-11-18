@@ -1,5 +1,8 @@
 ﻿using PokemonWebAPI.Models;
 using PokemonWebAPI.Controllers;
+using System.Globalization;
+using Microsoft.AspNetCore.Mvc;
+using PokemonWebAPI.DTO_Models;
 
 namespace PokemonWebAPI.Services
 {
@@ -33,57 +36,123 @@ namespace PokemonWebAPI.Services
 
         public List<Pokemon> PokemonList { get; set; } = new List<Pokemon>();
 
+        public List<PokemonStatisticsDto> PokemonStatisticsList { get; set; }
+
         public PokemonService(IHttpClientFactory httpClientFactory)
         {
             _client = httpClientFactory.CreateClient();
             _client.Timeout = TimeSpan.FromSeconds(120);
         }
 
-        public async Task SimulateTournament()
+        public async Task<List<PokemonStatisticsDto>> SimulateTournament(string sortBy, string sortDirection)
         {
-            var rand = new Random();
+            var validationResult = ValidateSortParameters(sortBy, sortDirection);
+            if (validationResult != null)
+            {
+                return null;
+            }
+
+            await FetchPokemonsAsync();
+
+            ConductFights();
+
+            SortPokemons(sortBy, sortDirection);
+
+            PokemonStatisticsList = MapToTournamentStatisticsDto(PokemonList);
+
+            if (PokemonStatisticsList != null)
+            {
+                return PokemonStatisticsList;
+            }
+            return null;
+        }
+
+        private async Task FetchPokemonsAsync()
+        {
             HashSet<int> randomIds = new HashSet<int>();
+            var rand = new Random();
 
             //If NUM_OF_POKEMON ever scales to 151, there is a chance we enter an infinite loop.
             //We must handle that here.
-            while (PokemonList.Count < NUM_OF_POKEMON) 
+            while (PokemonList.Count < NUM_OF_POKEMON)
             {
-                int pokemonId = rand.Next(1, 151);  
-                if (randomIds.Contains(pokemonId))
+                int pokemonId = rand.Next(1, 151);
+                Pokemon pokemon = await FetchPokemonAPIAsync(pokemonId);
+                //If we have already seen this pokemon or the pokemon contains a type we do not support, generate a new one.
+                if (randomIds.Contains(pokemonId) || !CounterType.ContainsKey(pokemon.Type))
                 {
                     continue;
                 }
-                Pokemon pokemon = await FetchPokemonAPIAsync(pokemonId);
-                if (pokemon != null) 
+
+                if (pokemon != null)
                 {
                     PokemonList.Add(pokemon);
                     randomIds.Add(pokemonId);
                 }
             }
+        }
 
+        private object GetSortValue(Pokemon pokemon, string sortBy)
+        {
+            return sortBy.ToLower() switch
+            {
+                "wins" => pokemon.Wins,
+                "losses" => pokemon.Losses,
+                "ties" => pokemon.Ties,
+                "name" => pokemon.Name,
+                "id" => pokemon.PokemonId,
+                _ => pokemon.Wins  // Default to sorting by wins
+            };
+        }
+
+        private void SortPokemons(string sortBy, string sortDirection)
+        {
+            // Sort the Pokémon based on the specified criteria passed in by the API.
+            PokemonList = sortDirection.Equals("asc", StringComparison.OrdinalIgnoreCase)
+                ? PokemonList.OrderBy(p => GetSortValue(p, sortBy)).ToList()
+                : PokemonList.OrderByDescending(p => GetSortValue(p, sortBy)).ToList();
+        }
+
+        private void ConductFights()
+        {
             //Round robin style fighting.
             for (int i = 0; i < PokemonList.Count; i++)
             {
-                for(int j = i + 1; j < PokemonList.Count; j++)
+                for (int j = i + 1; j < PokemonList.Count; j++)
                 {
                     //Skip if we are the same pokemon.
-                    if(i == j)
+                    if (i == j)
                     {
                         continue;
                     }
                     Fight(PokemonList[i], PokemonList[j]);
                 }
             }
-            
+        }
+
+        private IActionResult ValidateSortParameters(string sortBy, string sortDirection)
+        {
+            var validSortFields = new HashSet<string> { "wins", "losses", "ties", "name", "id" };
+            var validSortDirections = new HashSet<string> { "asc", "desc" };
+
+            // if the 'sortBy' is invalid, we will return a bad request:
+            if (string.IsNullOrWhiteSpace(sortBy) || !validSortFields.Contains(sortBy.ToLower()))
+            {
+                return new BadRequestObjectResult($"Invalid 'sortBy' parameter. Valid options are: {string.Join(", ", validSortFields)}.");
+            }
+
+            // if the 'sortDirection' is invalid, we will return a bad request:
+            if (!validSortDirections.Contains(sortDirection.ToLower()))
+            {
+                return new BadRequestObjectResult($"Invalid 'sortDirection' parameter. Valid options are: {string.Join(", ", validSortDirections)}.");
+            }
+
+            // Return null if everything is valid
+            return null;
         }
 
         public void Fight(Pokemon pokemon1,  Pokemon pokemon2)
-        {
-            //Safely ensure that both pokemon have a valid type
-            if(!CounterType.ContainsKey(pokemon1.Type) || !CounterType.ContainsKey(pokemon2.Type))
-            {
-                return;
-            }
+        { 
 
             if (CounterType[pokemon1.Type].Equals(pokemon2.Type))
             {
@@ -146,7 +215,19 @@ namespace PokemonWebAPI.Services
             }
         }
 
-
+        private List<PokemonStatisticsDto> MapToTournamentStatisticsDto(List<Pokemon> pokemons)
+        {
+            // Map Pokemon to TournamentStatisticsDto
+            return pokemons.Select(pokemon => new PokemonStatisticsDto
+            {
+                Id = pokemon.PokemonId,
+                Name = pokemon.Name,
+                Type = pokemon.Type,
+                Wins = pokemon.Wins,
+                Losses = pokemon.Losses,
+                Ties = pokemon.Ties
+            }).ToList();
+        }
 
     }
 }
