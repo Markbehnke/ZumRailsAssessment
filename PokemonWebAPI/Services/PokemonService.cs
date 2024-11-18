@@ -133,25 +133,16 @@ namespace PokemonWebAPI.Services
                 }
                 else
                 {
-                    // Log or handle non-success status codes (e.g., 404, 500)
                     var errorMessage = $"Failed to fetch Pokémon data for ID {id}. Status Code: {response.StatusCode}.";
-                    Console.WriteLine(errorMessage); // You can log this error or throw a custom exception
-                    return null;  // Return null if the request fails
+                    Console.WriteLine(errorMessage); 
+                    return null; 
                 }
-            }
-            catch (HttpRequestException ex)
-            {
-                // Handle network-related exceptions
-                var errorMessage = $"Network error while fetching Pokémon data for ID {id}. Exception: {ex.Message}";
-                Console.WriteLine(errorMessage); // Log the error
-                return null;  // Return null if there's an error
             }
             catch (Exception ex)
             {
-                // Handle any other unexpected exceptions
                 var errorMessage = $"Unexpected error while fetching Pokémon data for ID {id}. Exception: {ex.Message}";
-                Console.WriteLine(errorMessage); // Log the error
-                return null;  // Return null if there's an error
+                Console.WriteLine(errorMessage); 
+                return null;  
             }
         }
 
