@@ -15,11 +15,10 @@ namespace PokemonWebAPI.Controllers
         public PokemonController(PokemonService pokemonService)
         {
             _pokemonService = pokemonService;
-
         }
 
         [HttpGet("statistics")]
-        public async Task<IActionResult> GetTournamentStatistics([FromQuery] string sortBy, [FromQuery] string sortDirection)
+        public async Task<IActionResult> GetTournamentStatistics([FromQuery] string sortBy = "", [FromQuery] string sortDirection = "desc")
         {
             try
             {
@@ -37,7 +36,7 @@ namespace PokemonWebAPI.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest("Invalid sorting parameters.");
+                return BadRequest(ex.Message);
             }
             catch (HttpRequestException ex)
             {

@@ -31,15 +31,15 @@ namespace PokemonWebAPI.Models
     }
 
     public class TypeWrapper
-{
-    [JsonPropertyName("type")]
-    public TypeObject Type { get; set; }
-}
+    {
+        [JsonPropertyName("type")]
+        public TypeObject Type { get; set; }
+    }
 
-public class TypeObject
-{
-    [JsonPropertyName("name")]
-    public string Name { get; set; }
-}
+    public class TypeObject
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+    }
 
 }

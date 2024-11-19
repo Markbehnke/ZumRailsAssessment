@@ -5,6 +5,7 @@ using FluentAssertions;
 using PokemonWebAPI.Models;
 using PokemonWebAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 namespace PokemonWebAPI.UnitTests
 {
     public class PokemonServicesTests
@@ -16,7 +17,8 @@ namespace PokemonWebAPI.UnitTests
         {
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
             var mockHttpClient = new HttpClient(mockHttpMessageHandler.Object);
-            _pokemonService = new PokemonService(mockHttpClient);
+            var cacheMock = new MemoryCache(new MemoryCacheOptions());
+            _pokemonService = new PokemonService(mockHttpClient, cacheMock);
 
         }
 
@@ -52,6 +54,7 @@ namespace PokemonWebAPI.UnitTests
             pokemon2.Losses.Should().Be(1);
         }
 
+        //Check for ties
         [Fact]
         public void Fight_PokemonShouldHaveCorrectResultsAfterFight_BasedOnExperience_Ties()
         {
@@ -74,9 +77,8 @@ namespace PokemonWebAPI.UnitTests
             var sortBy = "invalid";
             var sortDirection = "asc";
 
-            var result = _pokemonService.ValidateSortParameters(sortBy, sortDirection);
-
-            result.Should().BeOfType<BadRequestObjectResult>();
+            Action act = () => _pokemonService.ValidateSortParameters(sortBy, sortDirection);
+            act.Should().Throw<ArgumentException>();
         }
 
         [Fact]
@@ -85,9 +87,8 @@ namespace PokemonWebAPI.UnitTests
             var sortBy = "wins";
             var sortDirection = "invalid";
 
-            var result = _pokemonService.ValidateSortParameters(sortBy, sortDirection);
-
-            result.Should().BeOfType<BadRequestObjectResult>();
+            Action act = () => _pokemonService.ValidateSortParameters(sortBy, sortDirection);
+            act.Should().Throw<ArgumentException>();  
         }
     }
 }

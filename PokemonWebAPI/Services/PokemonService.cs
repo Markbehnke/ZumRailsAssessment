@@ -3,6 +3,7 @@ using PokemonWebAPI.Controllers;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using PokemonWebAPI.DTO_Models;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace PokemonWebAPI.Services
 {
@@ -19,7 +20,6 @@ namespace PokemonWebAPI.Services
     {
         private const int NUM_OF_POKEMON = 8;
 
-        private readonly HttpClient _client;
         //{Key = Pokemon's type, Value = type it beats}
         private Dictionary<string, string> CounterType = new Dictionary<string, string>
         {
@@ -35,23 +35,26 @@ namespace PokemonWebAPI.Services
 
         public List<Pokemon> PokemonList { get; set; } = new List<Pokemon>();
         public List<PokemonStatisticsDto> PokemonStatisticsList { get; set; }
-
-        public PokemonService(HttpClient httpClientFactory)
+        private readonly HttpClient _client;
+        private readonly IMemoryCache _cache;
+        public PokemonService(HttpClient httpClientFactory, IMemoryCache cache)
         {
             _client = httpClientFactory;
             _client.Timeout = TimeSpan.FromSeconds(30);
+            _cache = cache;
         }
 
         //The main method we call to kick off the tournament simulation.
         public async Task<List<PokemonStatisticsDto>> SimulateTournament(string sortBy, string sortDirection)
         {
-            var validationResult = ValidateSortParameters(sortBy, sortDirection);
-            if (validationResult != null)
-            {
-                return null;
-            }
+
             try
             {
+                var validationResult = ValidateSortParameters(sortBy, sortDirection);
+                if (validationResult != null)
+                {
+                    return null;
+                }
                 await FetchPokemonsAsync();
 
                 ConductFights();
@@ -59,11 +62,14 @@ namespace PokemonWebAPI.Services
                 SortPokemons(sortBy, sortDirection);
 
                 PokemonStatisticsList = MapToTournamentStatisticsDto(PokemonList);
-
                 if (PokemonStatisticsList != null)
                 {
                     return PokemonStatisticsList;
                 }
+            }
+            catch (ArgumentException ex)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -84,6 +90,16 @@ namespace PokemonWebAPI.Services
             while (PokemonList.Count < NUM_OF_POKEMON)
             {
                 int pokemonId = rand.Next(1, 151);
+
+                // Check if we already have this pokemon in the cache.
+                var cachedKey = $"pokemon_{pokemonId}";
+                if (_cache.TryGetValue(cachedKey, out Pokemon cachedPokemon))
+                {
+                    PokemonList.Add(cachedPokemon); // Found a pokemon in theUse cached data
+                    randomIds.Add(pokemonId);
+                    continue;
+                }
+
                 Pokemon pokemon = await FetchPokemonAPIAsync(pokemonId);
                 if (randomIds.Contains(pokemonId) || !CounterType.ContainsKey(pokemon.Type))
                 {
@@ -152,13 +168,13 @@ namespace PokemonWebAPI.Services
             // if the 'sortBy' is invalid, we will return a bad request:
             if (string.IsNullOrWhiteSpace(sortBy) || !validSortFields.Contains(sortBy.ToLower()))
             {
-                return new BadRequestObjectResult($"Invalid 'sortBy' parameter. Valid options are: {string.Join(", ", validSortFields)}.");
+                throw new ArgumentException($"sortBy parameter is invalid. Valid options are: {string.Join(", ", validSortFields)}.");
             }
 
             // if the 'sortDirection' is invalid, we will return a bad request:
             if (!validSortDirections.Contains(sortDirection.ToLower()))
             {
-                return new BadRequestObjectResult($"Invalid 'sortDirection' parameter. Valid options are: {string.Join(", ", validSortDirections)}.");
+                throw new ArgumentException($"sortDirection parameter is invalid. Valid options are: {string.Join(", ", validSortDirections)}.");
             }
 
             // Return null if everything is valid
