@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PokemonWebAPI.Models;
 using PokemonWebAPI.Services;
-using System.IO;
-using System.Net.Http;
-using System.Net.Http.Headers;
+using PokemonWebAPI.DTO_Models;
 namespace PokemonWebAPI.Controllers
 {
     [ApiController]
@@ -21,69 +19,42 @@ namespace PokemonWebAPI.Controllers
         }
 
         [HttpGet("statistics")]
-        public async Task<IActionResult> GetTournamentStatistics([FromQuery] string sortBy = "wins", [FromQuery] string sortDirection = "desc")
+        public async Task<IActionResult> GetTournamentStatistics([FromQuery] string sortBy, [FromQuery] string sortDirection)
         {
-            var validationResult = ValidateSortParameters(sortBy, sortDirection);
-            if (validationResult != null)
+            try
             {
-                return validationResult;
+                await _pokemonService.SimulateTournament(sortBy, sortDirection);
+                List<PokemonStatisticsDto> pokemons = _pokemonService.PokemonStatisticsList;
+                if (pokemons == null || !pokemons.Any())
+                {
+                    return NotFound("No Pokemon found. Please try again.");
+                }
+                return Ok(pokemons);
             }
-            await _pokemonService.SimulateTournament();
-            List<Pokemon> pokemons = _pokemonService.PokemonList;
-
-            if (pokemons == null || !pokemons.Any())
+            catch (ArgumentNullException ex)
             {
-                return NotFound("No Pokémon found. Please ensure the tournament has been simulated.");
+                return BadRequest("Missing required parameters.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest("Invalid sorting parameters.");
+            }
+            catch (HttpRequestException ex)
+            {
+                return StatusCode(500, "External API request failed. Please try again later.");
+            }
+            catch (TimeoutException ex)
+            {
+                return StatusCode(408, "The request timed out. Please try again later.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred. Please try again later.");
             }
 
-            // Sort the Pokemon based on the specified criteria
-            var sortedPokemons = sortDirection.Equals("asc", StringComparison.OrdinalIgnoreCase)
-                ? pokemons.OrderBy(p => GetSortValue(p, sortBy)).ToList()
-                : pokemons.OrderByDescending(p => GetSortValue(p, sortBy)).ToList();
-
-            return Ok(sortedPokemons);
         }
-
-        private object GetSortValue(Pokemon pokemon, string sortBy)
-        {
-            return sortBy.ToLower() switch
-            {
-                "wins" => pokemon.Wins,
-                "losses" => pokemon.Losses,
-                "ties" => pokemon.Ties,
-                "name" => pokemon.Name,
-                "id" => pokemon.PokemonId,
-                _ => pokemon.Wins  // Default to sorting by wins
-            };
-        }
-
-        private IActionResult ValidateSortParameters(string sortBy, string sortDirection)
-        {
-            var validSortFields = new HashSet<string> { "wins", "losses", "ties", "name", "id" };
-            var validSortDirections = new HashSet<string> { "asc", "desc" };
-
-            // if the 'sortFields' is invalid, we will return a bad request:r
-            if (string.IsNullOrWhiteSpace(sortBy) || !validSortFields.Contains(sortBy.ToLower()))
-            {
-                return BadRequest($"Invalid 'sortBy' parameter. Valid options are: {string.Join(", ", validSortFields)}.");
-            }
-
-            // if the 'sortDirection' is invalid, we will return a bad request:
-            if (!validSortDirections.Contains(sortDirection.ToLower()))
-            {
-                return BadRequest("The 'sortDirection' parameter must be either 'asc' or 'desc'.");
-            }
-
-            // Return null if everything is valid
-            return null;
-        }
-
 
 
     }
-
-
-
-
 
 }
