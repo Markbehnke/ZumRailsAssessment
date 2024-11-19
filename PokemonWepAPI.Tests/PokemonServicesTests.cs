@@ -77,9 +77,8 @@ namespace PokemonWebAPI.UnitTests
             var sortBy = "invalid";
             var sortDirection = "asc";
 
-            var result = _pokemonService.ValidateSortParameters(sortBy, sortDirection);
-
-            result.Should().BeOfType<BadRequestObjectResult>();
+            Action act = () => _pokemonService.ValidateSortParameters(sortBy, sortDirection);
+            act.Should().Throw<ArgumentException>();
         }
 
         [Fact]
@@ -88,9 +87,8 @@ namespace PokemonWebAPI.UnitTests
             var sortBy = "wins";
             var sortDirection = "invalid";
 
-            var result = _pokemonService.ValidateSortParameters(sortBy, sortDirection);
-
-            result.Should().BeOfType<BadRequestObjectResult>();
+            Action act = () => _pokemonService.ValidateSortParameters(sortBy, sortDirection);
+            act.Should().Throw<ArgumentException>();  
         }
     }
 }
