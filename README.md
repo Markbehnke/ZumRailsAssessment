@@ -27,8 +27,35 @@ GET /pokemon/tournament/statistics?sortBy={sortBy}
 Parameters
 - `sortBy` (required): Field to sort by (`wins`, `losses`, `ties`, `name`, `id`).
 - `sortDirection` (optional): Direction to sort (`asc`, `desc`). Defaults to descending if left blank
-Example return json:
-[
+
+<br>
+Example:
+http
+  GET pokemon/tournament/statistics?sortBy=wins
+Example:
+ <pre>[
+  {
+    "id": 131,
+    "name": "lapras",
+    "type": "water",
+    "wins": 6,
+    "losses": 1,
+    "ties": 0
+  },
+  {
+    "id": 68,
+    "name": "machamp",
+    "type": "fighting",
+    "wins": 5,
+    "losses": 2,
+    "ties": 0
+  },
+ ...
+ ]</pre>
+Example with sortDirection specified:
+http
+  GET pokemon/tournament/statistics?sortBy=wins&sortDirection=asc
+<pre> 
  [
   {
     "id": 116,
@@ -47,16 +74,7 @@ Example return json:
     "ties": 0
   },
   ...
-  ]
-]
-Example:
-http
-  GET pokemon/tournament/statistics?sortBy=wins
-
-Example with sortDirection specified:
-http
-  GET pokemon/tournament/statistics?sortBy=wins&sortDirection=asc
-
+]</pre>
 
 ## How to Run
 
