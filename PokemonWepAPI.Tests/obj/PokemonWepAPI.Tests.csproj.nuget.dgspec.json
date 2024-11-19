@@ -1,0 +1,177 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\markb\\OneDrive\\Desktop\\Coding\\ZumRails\\ZumRailsAssessment\\PokemonWepAPI.Tests\\PokemonWepAPI.Tests.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\markb\\OneDrive\\Desktop\\Coding\\ZumRails\\ZumRailsAssessment\\PokemonWebAPI\\PokemonWebAPI.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\markb\\OneDrive\\Desktop\\Coding\\ZumRails\\ZumRailsAssessment\\PokemonWebAPI\\PokemonWebAPI.csproj",
+        "projectName": "PokemonWebAPI",
+        "projectPath": "C:\\Users\\markb\\OneDrive\\Desktop\\Coding\\ZumRails\\ZumRailsAssessment\\PokemonWebAPI\\PokemonWebAPI.csproj",
+        "packagesPath": "C:\\Users\\markb\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\markb\\OneDrive\\Desktop\\Coding\\ZumRails\\ZumRailsAssessment\\PokemonWebAPI\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\markb\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\PROGRAM FILES\\DOTNET\\library-packs": {},
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.4.0, )"
+            },
+            "System.Net.Http.Json": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\PROGRAM FILES\\DOTNET\\sdk\\8.0.302/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\markb\\OneDrive\\Desktop\\Coding\\ZumRails\\ZumRailsAssessment\\PokemonWepAPI.Tests\\PokemonWepAPI.Tests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\markb\\OneDrive\\Desktop\\Coding\\ZumRails\\ZumRailsAssessment\\PokemonWepAPI.Tests\\PokemonWepAPI.Tests.csproj",
+        "projectName": "PokemonWepAPI.Tests",
+        "projectPath": "C:\\Users\\markb\\OneDrive\\Desktop\\Coding\\ZumRails\\ZumRailsAssessment\\PokemonWepAPI.Tests\\PokemonWepAPI.Tests.csproj",
+        "packagesPath": "C:\\Users\\markb\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\markb\\OneDrive\\Desktop\\Coding\\ZumRails\\ZumRailsAssessment\\PokemonWepAPI.Tests\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\markb\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\PROGRAM FILES\\DOTNET\\library-packs": {},
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\Users\\markb\\OneDrive\\Desktop\\Coding\\ZumRails\\ZumRailsAssessment\\PokemonWebAPI\\PokemonWebAPI.csproj": {
+                "projectPath": "C:\\Users\\markb\\OneDrive\\Desktop\\Coding\\ZumRails\\ZumRailsAssessment\\PokemonWebAPI\\PokemonWebAPI.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "FluentAssertions": {
+              "target": "Package",
+              "version": "[6.12.2, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[17.8.0, )"
+            },
+            "Moq": {
+              "target": "Package",
+              "version": "[4.20.72, )"
+            },
+            "coverlet.collector": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.5.3, )"
+            },
+            "xunit.runner.visualstudio": {
+              "target": "Package",
+              "version": "[2.5.3, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\PROGRAM FILES\\DOTNET\\sdk\\8.0.302/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

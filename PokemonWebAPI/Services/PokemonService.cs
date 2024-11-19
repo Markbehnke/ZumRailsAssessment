@@ -19,7 +19,6 @@ namespace PokemonWebAPI.Services
     {
         private const int NUM_OF_POKEMON = 8;
 
-        private readonly PokemonController _pokemonController;
         private readonly HttpClient _client;
         //{Key = Pokemon's type, Value = type it beats}
         private Dictionary<string, string> CounterType = new Dictionary<string, string>
@@ -35,15 +34,15 @@ namespace PokemonWebAPI.Services
         };
 
         public List<Pokemon> PokemonList { get; set; } = new List<Pokemon>();
-
         public List<PokemonStatisticsDto> PokemonStatisticsList { get; set; }
 
-        public PokemonService(IHttpClientFactory httpClientFactory)
+        public PokemonService(HttpClient httpClientFactory)
         {
-            _client = httpClientFactory.CreateClient();
-            _client.Timeout = TimeSpan.FromSeconds(120);
+            _client = httpClientFactory;
+            _client.Timeout = TimeSpan.FromSeconds(30);
         }
 
+        //The main method we call to kick off the tournament simulation.
         public async Task<List<PokemonStatisticsDto>> SimulateTournament(string sortBy, string sortDirection)
         {
             var validationResult = ValidateSortParameters(sortBy, sortDirection);
@@ -51,36 +50,49 @@ namespace PokemonWebAPI.Services
             {
                 return null;
             }
-
-            await FetchPokemonsAsync();
-
-            ConductFights();
-
-            SortPokemons(sortBy, sortDirection);
-
-            PokemonStatisticsList = MapToTournamentStatisticsDto(PokemonList);
-
-            if (PokemonStatisticsList != null)
+            try
             {
-                return PokemonStatisticsList;
+                await FetchPokemonsAsync();
+
+                ConductFights();
+
+                SortPokemons(sortBy, sortDirection);
+
+                PokemonStatisticsList = MapToTournamentStatisticsDto(PokemonList);
+
+                if (PokemonStatisticsList != null)
+                {
+                    return PokemonStatisticsList;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
             }
             return null;
+
         }
 
         private async Task FetchPokemonsAsync()
         {
             HashSet<int> randomIds = new HashSet<int>();
             var rand = new Random();
+            // Maximum number of retries before breaking the loop to avoid infinite loops
+            int maxRetries = 1000;
+            int retries = 0;
 
-            //If NUM_OF_POKEMON ever scales to 151, there is a chance we enter an infinite loop.
-            //We must handle that here.
             while (PokemonList.Count < NUM_OF_POKEMON)
             {
                 int pokemonId = rand.Next(1, 151);
                 Pokemon pokemon = await FetchPokemonAPIAsync(pokemonId);
-                //If we have already seen this pokemon or the pokemon contains a type we do not support, generate a new one.
                 if (randomIds.Contains(pokemonId) || !CounterType.ContainsKey(pokemon.Type))
                 {
+                    retries++;
+                    // If we've exceeded the maximum retries, break the loop to avoid an infinite loop
+                    if (retries >= maxRetries)
+                    {
+                        throw new Exception("Max retries reached. Please choose a lower number.");
+                    }
                     continue;
                 }
 
@@ -88,8 +100,10 @@ namespace PokemonWebAPI.Services
                 {
                     PokemonList.Add(pokemon);
                     randomIds.Add(pokemonId);
+                    retries = 0; // Reset retries if we find a match.
                 }
             }
+
         }
 
         private object GetSortValue(Pokemon pokemon, string sortBy)
@@ -107,13 +121,13 @@ namespace PokemonWebAPI.Services
 
         private void SortPokemons(string sortBy, string sortDirection)
         {
-            // Sort the Pokémon based on the specified criteria passed in by the API.
+            // Sort the pokes based on the specified criteria passed in by the API.
             PokemonList = sortDirection.Equals("asc", StringComparison.OrdinalIgnoreCase)
                 ? PokemonList.OrderBy(p => GetSortValue(p, sortBy)).ToList()
                 : PokemonList.OrderByDescending(p => GetSortValue(p, sortBy)).ToList();
         }
 
-        private void ConductFights()
+        public void ConductFights()
         {
             //Round robin style fighting.
             for (int i = 0; i < PokemonList.Count; i++)
@@ -130,7 +144,7 @@ namespace PokemonWebAPI.Services
             }
         }
 
-        private IActionResult ValidateSortParameters(string sortBy, string sortDirection)
+        public IActionResult ValidateSortParameters(string sortBy, string sortDirection)
         {
             var validSortFields = new HashSet<string> { "wins", "losses", "ties", "name", "id" };
             var validSortDirections = new HashSet<string> { "asc", "desc" };
@@ -153,7 +167,6 @@ namespace PokemonWebAPI.Services
 
         public void Fight(Pokemon pokemon1,  Pokemon pokemon2)
         { 
-
             if (CounterType[pokemon1.Type].Equals(pokemon2.Type))
             {
                 pokemon1.Wins++;
@@ -166,7 +179,6 @@ namespace PokemonWebAPI.Services
             }
             else
             {
-            
                 if (pokemon1.Experience == pokemon2.Experience)
                 {
                     pokemon1.Ties++;
@@ -197,18 +209,17 @@ namespace PokemonWebAPI.Services
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // Deserialize and return the Pokémon data
                     return await response.Content.ReadFromJsonAsync<Pokemon>();
                 }
                 else
                 {
-                    var errorMessage = $"Failed to fetch Pokémon data for ID {id}. Status Code: {response.StatusCode}.";
+                    var errorMessage = $"Failed to fetch Pokemon data for ID {id}. Status Code: {response.StatusCode}.";
                     return null; 
                 }
             }
             catch (Exception ex)
             {
-                var errorMessage = $"Unexpected error while fetching Pokémon data for ID {id}. Exception: {ex.Message}";
+                var errorMessage = $"Unexpected error while fetching Pokemon data for ID {id}. Exception: {ex.Message}";
                 return null;  
             }
         }
