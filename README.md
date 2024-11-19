@@ -99,7 +99,7 @@ Follow these steps to run the project locally:
 
 4. **Set Up the Frontend (Angular App)**  
    Navigate to the frontend project folder:  
-   `cd PokemonFrontend`
+   `cd pokemon-app`
    
    Install the required dependencies:  
    `npm install`
