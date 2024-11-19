@@ -3,13 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { OnInit } from '@angular/core';
-import { PokemonService } from './pokemon.service';  // Import PokemonService
+import { PokemonService } from './pokemon.service';
 
 @Component({
     selector: 'app-tournament-statistics',
     standalone: true,
-    imports: [CommonModule, FormsModule],  // Include FormsModule here
-    providers: [PokemonService],  // Provide PokemonService here
+    imports: [CommonModule, FormsModule],
+    providers: [PokemonService],
     templateUrl: './tournament-statistics.component.html'
 })
 export class TournamentStatisticsComponent implements OnInit {
