@@ -139,4 +139,4 @@ To run tests for the backend, use:
 
 The API is designed to scale if we decide to increase the number of Pokemon in the tournament (e.g., going beyond 8 participants). The logic accounts for the possibility of repeatedly selecting the same random number by handling retries within the loop where Pokemon IDs are generated (between 1 and 151).
 Caching has been implemented to reduce redundant API calls, ensuring that previously fetched Pokemon data is reused efficiently.
-Pagination was considered for the frontend to manage large Pokemon datasets. However, it was not implemented as the rubric did not require it. If we decide to scale the tournament and increase the Pokemon pool significantly, pagination should be implemented to improve performance and user experience.
+Pagination was considered for the frontend to manage large Pokemon datasets. If we decide to scale the tournament and increase the Pokemon pool significantly, pagination should be implemented to improve performance and user experience.
