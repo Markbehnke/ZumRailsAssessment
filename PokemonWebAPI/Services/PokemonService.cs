@@ -143,6 +143,7 @@ namespace PokemonWebAPI.Services
                 : PokemonList.OrderByDescending(p => GetSortValue(p, sortBy)).ToList();
         }
 
+        //Each pokemon will fight the other pokemon once.
         public void ConductFights()
         {
             //Round robin style fighting.
@@ -160,6 +161,7 @@ namespace PokemonWebAPI.Services
             }
         }
 
+        //Validates the parameters passed in by the query.
         public IActionResult ValidateSortParameters(string sortBy, string sortDirection)
         {
             var validSortFields = new HashSet<string> { "wins", "losses", "ties", "name", "id" };
@@ -181,6 +183,14 @@ namespace PokemonWebAPI.Services
             return null;
         }
 
+
+
+        /*
+         *  If it is not possible to define a winner based on type, the pokemon with the highest
+            base_experience wins. If they are the same, consider it a tie.
+
+        The "Counter" table is up above where the Key is the type which maps to the counter.
+         */
         public void Fight(Pokemon pokemon1,  Pokemon pokemon2)
         { 
             if (CounterType[pokemon1.Type].Equals(pokemon2.Type))
@@ -229,14 +239,13 @@ namespace PokemonWebAPI.Services
                 }
                 else
                 {
-                    var errorMessage = $"Failed to fetch Pokemon data for ID {id}. Status Code: {response.StatusCode}.";
-                    return null; 
+                    throw new Exception($"Unexpected error while fetching Pokemon data for ID {id}");
                 }
             }
             catch (Exception ex)
             {
                 var errorMessage = $"Unexpected error while fetching Pokemon data for ID {id}. Exception: {ex.Message}";
-                return null;  
+                throw new Exception(errorMessage, ex);
             }
         }
 
